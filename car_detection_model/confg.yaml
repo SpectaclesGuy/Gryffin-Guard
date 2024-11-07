@@ -1,0 +1,7 @@
+path: C:\SWE Lab Project\car_detection_model\augumented data
+train: train
+val: valid
+test: test
+
+nc: 1
+names: ['Car Detection - v1 2024-04-27 9-49pm']
