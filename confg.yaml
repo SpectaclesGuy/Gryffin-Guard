@@ -1,7 +1,0 @@
-path: C:/SWE Lab Project/augumented data
-train: train
-val: val
-
-#classes
-names:
-  0: license_plate
