@@ -1,3 +1,0 @@
-yolo11n
-4k images
-200 epochs
