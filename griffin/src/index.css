@@ -6,4 +6,27 @@
   .head {
     font-family: "Dancing Script", serif;
   }
+  .bg-primary {
+    background-color: #1E3A8A;
+  }
+  
+  .bg-accent {
+    background-color: #E6A23C;
+  }
+  
+  .text-white {
+    color: #FFFFFF;
+  }
+  
+  .text-muted {
+    color: #E5E7EB;
+  }
+  
+  .border-muted {
+    border-color: #2D3748;
+  }
+  
+  .bg-dark {
+    background-color: #1A202C;
+  }
 }
