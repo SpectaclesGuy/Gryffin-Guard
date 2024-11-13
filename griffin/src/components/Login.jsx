@@ -26,7 +26,7 @@ const Login = () => {
     className="absolute inset-0 z-0"
   ></div>
 
-  {/* Foreground Content */}
+  
   <div className="relative z-10 w-full max-w-3xl space-y-8 bg-opacity-70 p-8 rounded-lg">
     <div className="text-center max-w-3xl">
       <h2 className="text-9xl max-w-3xl font-cursive text-accent text-white mb-8 head">
