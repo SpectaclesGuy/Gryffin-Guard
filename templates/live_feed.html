@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Feed - ANPR System</title>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-7xl mx-auto p-4">
+        <!-- Header Section -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold">Live Feed</h1>
+            <a href="/" class="text-blue-600 hover:text-blue-800">Back to Home</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Live Feed Section -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="mb-4 flex space-x-4">
+                    <button onclick="startFeed()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                        Start Feed
+                    </button>
+                    <button onclick="stopFeed()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                        Stop Feed
+                    </button>
+                </div>
+                <img id="videoFeed" src="" alt="Live Feed" class="w-full" style="display: none;">
+            </div>
+
+            <!-- Search Section -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <!-- Vehicle Number Search -->
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold mb-4">Search by Vehicle Number</h2>
+                    <form onsubmit="searchVehicle(event)" class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="vehicleNumber" 
+                            placeholder="Enter vehicle number" 
+                            class="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                        >
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                            Search
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Time Period Search -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Search by Time Period</h2>
+                    <form onsubmit="searchTimeperiod(event)" class="space-y-3">
+                        <div>
+                            <label for="startTime" class="block text-sm font-medium text-gray-700">Start Time</label>
+                            <input 
+                                type="datetime-local" 
+                                id="startTime" 
+                                class="mt-1 block w-full border rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            >
+                        </div>
+                        <div>
+                            <label for="endTime" class="block text-sm font-medium text-gray-700">End Time</label>
+                            <input 
+                                type="datetime-local" 
+                                id="endTime" 
+                                class="mt-1 block w-full border rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            >
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                            Search
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Search Results -->
+                <div id="searchResults" class="mt-6">
+                    <div id="react-search-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // SearchResultsTable Component
+        const SearchResultsTable = ({ results }) => {
+            if (!results || results.length === 0) {
+                return React.createElement('div', { className: 'bg-gray-50 border rounded-lg p-4' },
+                    React.createElement('p', { className: 'text-gray-500 text-center' }, 'No results found')
+                );
+            }
+
+            return React.createElement('div', { className: 'border rounded-lg' },
+                React.createElement('div', { className: 'max-h-96 overflow-auto' },
+                    React.createElement('table', { className: 'min-w-full divide-y divide-gray-200' },
+                        React.createElement('thead', { className: 'bg-gray-50 sticky top-0' },
+                            React.createElement('tr', null,
+                                React.createElement('th', { className: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider' }, 'ID'),
+                                React.createElement('th', { className: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider' }, 'Vehicle Number'),
+                                React.createElement('th', { className: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider' }, 'Entry Time'),
+                                React.createElement('th', { className: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider' }, 'Exit Time')
+                            )
+                        ),
+                        React.createElement('tbody', { className: 'bg-white divide-y divide-gray-200' },
+                            results.map(result =>
+                                React.createElement('tr', { key: result.id },
+                                    React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500' }, result.id),
+                                    React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900' }, result.vehicle_number),
+                                    React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500' }, result.in_time),
+                                    React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-sm text-gray-500' }, result.out_time || 'Still Inside')
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // Feed Control Functions
+        function startFeed() {
+            fetch('/start_live_feed')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('videoFeed').style.display = 'block';
+                        document.getElementById('videoFeed').src = '/video_feed';
+                    }
+                });
+        }
+
+        function stopFeed() {
+            fetch('/stop_live_feed')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('videoFeed').style.display = 'none';
+                        document.getElementById('videoFeed').src = '';
+                    }
+                });
+        }
+
+        // Search Functions
+        function updateSearchResults(results) {
+            const container = document.getElementById('react-search-results');
+            if (container) {
+                ReactDOM.render(
+                    React.createElement(SearchResultsTable, { results: results }),
+                    container
+                );
+            }
+        }
+
+        async function searchVehicle(event) {
+            event.preventDefault();
+            const vehicleNumber = document.getElementById('vehicleNumber').value;
+            
+            const response = await fetch('/search_vehicle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ vehicle_number: vehicleNumber })
+            });
+            
+            const data = await response.json();
+            updateSearchResults(data.results);
+        }
+
+        async function searchTimeperiod(event) {
+            event.preventDefault();
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            
+            const response = await fetch('/search_timeperiod', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ start_time: startTime, end_time: endTime })
+            });
+            
+            const data = await response.json();
+            updateSearchResults(data.results);
+        }
+    </script>
+</body>
+</html>

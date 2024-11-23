@@ -1,0 +1,118 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANPR System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">ANPR System</h1>
+        
+        <!-- Live Feed Section -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Live Feed</h2>
+            <div class="flex flex-col items-center">
+                <div class="mb-4">
+                    <button id="startFeed" class="bg-green-500 text-white px-4 py-2 rounded mr-2">Start Live Feed</button>
+                    <button id="stopFeed" class="bg-red-500 text-white px-4 py-2 rounded">Stop Live Feed</button>
+                </div>
+                <div id="videoContainer" class="w-full max-w-3xl bg-black">
+                    <img id="videoFeed" src="" alt="Live Feed" class="w-full hidden">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Video Upload Section -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Video Upload</h2>
+            <div class="flex flex-col items-center">
+                <form id="uploadForm" class="w-full max-w-3xl">
+                    <div class="flex items-center justify-center w-full">
+                        <label class="flex flex-col w-full h-32 border-4 border-dashed hover:bg-gray-100 hover:border-gray-300">
+                            <div class="flex flex-col items-center justify-center pt-7">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-400 group-hover:text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                                </svg>
+                                <p class="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
+                                    Select a video</p>
+                            </div>
+                            <input type="file" class="opacity-0" accept="video/*" id="videoFile" />
+                        </label>
+                    </div>
+                    <button type="submit" class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded">
+                        Process Video
+                    </button>
+                </form>
+                
+                <!-- Results Section -->
+                <div id="results" class="mt-8 w-full max-w-3xl hidden">
+                    <h3 class="text-xl font-semibold mb-4">Detected License Plates</h3>
+                    <div id="plateList" class="bg-white rounded-lg shadow p-4">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Live Feed Controls
+        document.getElementById('startFeed').addEventListener('click', async () => {
+            const response = await fetch('/start_live_feed');
+            const data = await response.json();
+            if (data.status === 'success') {
+                document.getElementById('videoFeed').src = '/video_feed';
+                document.getElementById('videoFeed').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('stopFeed').addEventListener('click', async () => {
+            const response = await fetch('/stop_live_feed');
+            const data = await response.json();
+            if (data.status === 'success') {
+                document.getElementById('videoFeed').classList.add('hidden');
+                document.getElementById('videoFeed').src = '';
+            }
+        });
+
+        // Video Upload
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('videoFile');
+            if (!fileInput.files[0]) {
+                alert('Please select a video file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/process_video', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Display results
+                    document.getElementById('results').classList.remove('hidden');
+                    const plateList = document.getElementById('plateList');
+                    plateList.innerHTML = data.detected_plates
+                        .map(plate => `<div class="p-2 border-b">${plate}</div>`)
+                        .join('');
+                } else {
+                    alert('Error processing video: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error uploading video: ' + error);
+            }
+        });
+    </script>
+</body>
+</html>
