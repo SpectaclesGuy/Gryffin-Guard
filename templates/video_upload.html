@@ -3,95 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Upload - ANPR System</title>
+    <title>Video Upload and Query System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
     <div class="max-w-7xl mx-auto p-4">
-        <!-- Header Section -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold">Video Upload</h1>
+            <h1 class="text-3xl font-bold">Video Upload and Query System</h1>
             <a href="/" class="text-blue-600 hover:text-blue-800">Back to Home</a>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Video Upload Section -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <form onsubmit="processVideo(event)" class="mb-4">
-                    <div class="mb-4">
-                        <label for="videoFile" class="block text-sm font-medium text-gray-700 mb-2">Upload Video File</label>
+                <h2 class="text-xl font-semibold mb-4">Upload Video</h2>
+                <form id="uploadForm" class="space-y-4">
+                    <div>
                         <input 
                             type="file" 
                             id="videoFile" 
-                            accept="video/*"
-                            class="block w-full text-sm text-gray-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-full file:border-0
-                                file:text-sm file:font-semibold
-                                file:bg-blue-50 file:text-blue-700
-                                hover:file:bg-blue-100"
-                            required
+                            accept="video/*" 
+                            class="w-full p-2 border rounded text-sm text-gray-500 
+                            file:mr-4 file:py-2 file:px-4
+                            file:rounded file:border-0
+                            file:text-sm file:font-semibold
+                            file:bg-blue-50 file:text-blue-700
+                            hover:file:bg-blue-100"
                         >
                     </div>
-                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    <button 
+                        type="submit" 
+                        class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                    >
                         Process Video
                     </button>
                 </form>
 
-                <div id="processingStatus" class="mt-4"></div>
-                <div id="detectedPlates" class="mt-4"></div>
+                <div id="processingStatus" class="mt-4 text-center text-sm text-gray-600"></div>
+                
+                <div id="detectedPlates" class="mt-4 border-t pt-4">
+                    <h3 class="font-semibold text-gray-700 mb-2">Detected License Plates:</h3>
+                    <ul id="plateList" class="space-y-1 text-sm text-gray-600"></ul>
+                </div>
             </div>
 
-            <!-- Search Section -->
+            <!-- Query System Section -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <!-- Vehicle Number Search -->
                 <div class="mb-8">
                     <h2 class="text-xl font-semibold mb-4">Search by Vehicle Number</h2>
-                    <form onsubmit="searchVehicle(event)" class="flex gap-2">
+                    <div class="flex space-x-2">
                         <input 
                             type="text" 
-                            id="vehicleNumber" 
-                            placeholder="Enter vehicle number" 
-                            class="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
+                            id="vehicleNumberSearch" 
+                            placeholder="Enter Vehicle Number" 
+                            class="flex-grow p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
                         >
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                        <button 
+                            onclick="searchByVehicleNumber()" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                        >
                             Search
                         </button>
-                    </form>
+                    </div>
                 </div>
 
-                <!-- Time Period Search -->
                 <div>
                     <h2 class="text-xl font-semibold mb-4">Search by Time Period</h2>
-                    <form onsubmit="searchTimeperiod(event)" class="space-y-3">
+                    <div class="space-y-4">
                         <div>
-                            <label for="startTime" class="block text-sm font-medium text-gray-700">Start Time</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-700">Start Time</label>
                             <input 
                                 type="datetime-local" 
                                 id="startTime" 
-                                class="mt-1 block w-full border rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
+                                class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
                             >
                         </div>
                         <div>
-                            <label for="endTime" class="block text-sm font-medium text-gray-700">End Time</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-700">End Time</label>
                             <input 
                                 type="datetime-local" 
                                 id="endTime" 
-                                class="mt-1 block w-full border rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
+                                class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-300"
                             >
                         </div>
-                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                        <button 
+                            onclick="searchByTimePeriod()" 
+                            class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
+                        >
                             Search
                         </button>
-                    </form>
+                    </div>
                 </div>
 
-                <!-- Search Results -->
                 <div id="searchResults" class="mt-6">
                     <div id="react-search-results"></div>
                 </div>
@@ -100,6 +106,7 @@
     </div>
 
     <script>
+        // React Component for Search Results Table
         const SearchResultsTable = ({ results }) => {
             if (!results || results.length === 0) {
                 return React.createElement('div', { className: 'bg-gray-50 border rounded-lg p-4' },
@@ -132,50 +139,8 @@
                 )
             );
         };
-        async function processVideo() {
-            const videoFile = document.getElementById('videoFile').files[0];
-            if (!videoFile) {
-                alert('Please select a video file first');
-                return;
-            }
 
-            const formData = new FormData();
-            formData.append('video', videoFile);
-
-            const statusDiv = document.getElementById('processingStatus');
-            const platesDiv = document.getElementById('detectedPlates');
-            
-            statusDiv.innerHTML = '<p class="text-blue-600">Processing video...</p>';
-            platesDiv.innerHTML = '';
-
-            try {
-                const response = await fetch('/process_video', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (data.error) {
-                    statusDiv.innerHTML = `<p class="text-red-600">Error: ${data.error}</p>`;
-                    return;
-                }
-
-                statusDiv.innerHTML = '<p class="text-green-600">Video processing completed!</p>';
-                
-                if (data.detected_plates && data.detected_plates.length > 0) {
-                    let html = '<h3 class="font-semibold mb-2">Detected License Plates:</h3><ul class="list-disc pl-5">';
-                    data.detected_plates.forEach(plate => {
-                        html += `<li>${plate}</li>`;
-                    });
-                    html += '</ul>';
-                    platesDiv.innerHTML = html;
-                } else {
-                    platesDiv.innerHTML = '<p>No license plates detected</p>';
-                }
-            } catch (error) {
-                statusDiv.innerHTML = '<p class="text-red-600">Error processing video</p>';
-            }
-        }
+        // Update Search Results
         function updateSearchResults(results) {
             const container = document.getElementById('react-search-results');
             if (container) {
@@ -186,38 +151,85 @@
             }
         }
 
-        async function searchVehicle(event) {
-            event.preventDefault();
-            const vehicleNumber = document.getElementById('vehicleNumber').value;
-            
-            const response = await fetch('/search_vehicle', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ vehicle_number: vehicleNumber })
+        // Video Upload Logic
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const videoFile = document.getElementById('videoFile').files[0];
+            const processingStatus = document.getElementById('processingStatus');
+            const plateList = document.getElementById('plateList');
+
+            if (!videoFile) {
+                alert('Please select a video file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', videoFile);
+
+            processingStatus.innerHTML = '<span class="text-blue-600">Processing video...</span>';
+            plateList.innerHTML = '';
+
+            axios.post('/process_video', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            })
+            .then(response => {
+                processingStatus.innerHTML = '<span class="text-green-600">Video processed successfully!</span>';
+                const detectedPlates = response.data.detected_plates || [];
+
+                if (detectedPlates.length > 0) {
+                    detectedPlates.forEach(plate => {
+                        const li = document.createElement('li');
+                        li.className = 'bg-blue-50 p-2 rounded text-blue-800';
+                        li.textContent = plate;
+                        plateList.appendChild(li);
+                    });
+                } else {
+                    plateList.innerHTML = '<li class="text-gray-500">No license plates detected</li>';
+                }
+            })
+            .catch(error => {
+                processingStatus.innerHTML = '<span class="text-red-600">Error processing video</span>';
+                console.error('Error:', error);
             });
-            
-            const data = await response.json();
-            updateSearchResults(data.results);
+        });
+
+        // Search by Vehicle Number
+        function searchByVehicleNumber() {
+            const vehicleNumber = document.getElementById('vehicleNumberSearch').value;
+
+            if (!vehicleNumber) {
+                alert('Please enter a vehicle number');
+                return;
+            }
+
+            axios.post('/search_vehicle', { vehicle_number: vehicleNumber })
+                .then(response => {
+                    updateSearchResults(response.data.results || []);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
 
-        async function searchTimeperiod(event) {
-            event.preventDefault();
+        // Search by Time Period
+        function searchByTimePeriod() {
             const startTime = document.getElementById('startTime').value;
             const endTime = document.getElementById('endTime').value;
-            
-            const response = await fetch('/search_timeperiod', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ start_time: startTime, end_time: endTime })
-            });
-            
-            const data = await response.json();
-            updateSearchResults(data.results);
+
+            if (!startTime || !endTime) {
+                alert('Please select both start and end times');
+                return;
+            }
+
+            axios.post('/search_timeperiod', { start_time: startTime, end_time: endTime })
+                .then(response => {
+                    updateSearchResults(response.data.results || []);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
     </script>
 </body>
-</html>        
+</html>
