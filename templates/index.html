@@ -3,31 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANPR System</title>
+    <title>Gryffin Guard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="max-w-6xl mx-auto p-8">
-        <h1 class="text-3xl font-bold text-center mb-8">ANPR System</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Live Feed Card -->
-            <a href="/live_feed" class="block">
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                    <h2 class="text-xl font-semibold mb-4">Live Feed</h2>
-                    <p class="text-gray-600">Access real-time ANPR detection using your camera</p>
-                    <div class="mt-4 text-blue-600">Start Live Feed →</div>
+<body>
+    <div class="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+        <div class="bg-green-400 p-4 shadow-lg">
+          <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-white tracking-wide">
+              Welcome User1
+            </h1>
+            <a href="/">
+            <button
+              class="px-4 py-2 text-white border border-white rounded-lg 
+                hover:bg-white hover:text-green-400 transition-all duration-300 ease-in-out"
+            >
+              Logout
+            </button>
+        </a>
+          </div>
+        </div>
+        <div class="flex justify-center items-center h-[calc(100vh-5rem)]">
+            <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="transform transition-all duration-300">
+                    <a href="/live_feed">
+                  <button class="w-full h-full bg-white/10 backdrop-blur-lg rounded-xl p-8 
+                    border border-white/10 shadow-2xl hover:bg-white/20 
+                    transition-all duration-300 group">
+                    <div class="flex flex-col items-center space-y-6">
+                      <span class="text-xl font-semibold text-white group-hover:scale-105 
+                        transition-transform duration-300">
+                        Use Live Feed
+                      </span>
+                      <svg class="w-16 h-16 text-white group-hover:scale-110 
+                        transition-transform duration-300" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                    </div>
+                  </button>
+                </a>
                 </div>
-            </a>
-            
-            <!-- Video Upload Card -->
-            <a href="/video_upload" class="block">
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                    <h2 class="text-xl font-semibold mb-4">Video Upload</h2>
-                    <p class="text-gray-600">Process pre-recorded videos for ANPR detection</p>
-                    <div class="mt-4 text-blue-600">Upload Video →</div>
+              
+                <div class="transform hover:scale-102 transition-all duration-300">
+                  <a href="/video_upload"><button 
+                    class="w-full h-full bg-white/10 backdrop-blur-lg rounded-xl p-8 
+                      border border-white/10 shadow-2xl hover:bg-white/20 
+                      transition-all duration-300 group"
+                  >
+                    <div class="flex flex-col items-center space-y-6">
+                      <span class="text-xl font-semibold text-white group-hover:scale-105 
+                        transition-transform duration-300">
+                        Upload sample video
+                      </span>
+                      <svg class="w-16 h-16 text-white group-hover:scale-110 
+                        transition-transform duration-300" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        stroke-width="1.5">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                    </div>
+                  </button>
+                  </a>
                 </div>
-            </a>
+              </div>
         </div>
     </div>
 </body>

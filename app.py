@@ -139,10 +139,13 @@ def generate_frames():
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/')
+def index1():
+    """Render main page with navigation"""
+    return render_template('index1.html')
+@app.route('/index')
 def index():
     """Render main page with navigation"""
     return render_template('index.html')
-
 @app.route('/live_feed')
 def live_feed_page():
     """Render live feed page"""
